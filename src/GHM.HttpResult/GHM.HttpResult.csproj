@@ -4,13 +4,13 @@
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Title>GHM Pipeline</Title>
-	<Version>1.0.1</Version>
+    <Title>GHM HttpResult</Title>
+	<Version>1.0.0</Version>
 	<PackageId>GHM.HttpResult</PackageId>
 	<Authors>Gustavo Henrique Messias</Authors>
 	<Company>Gustavo Henrique Messias</Company>
-	<PackageTags>pipeline</PackageTags>
-	<Description>A package for pipeline management</Description>
+	<PackageTags>http;result</PackageTags>
+	<Description>A package for typing HttpResult</Description>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<PackageProjectUrl>https://github.com/GustavoM96/GHM.HttpResult</PackageProjectUrl>
 	<RepositoryUrl>https://github.com/GustavoM96/GHM.HttpResult</RepositoryUrl>
