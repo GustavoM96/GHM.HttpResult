@@ -1,19 +1,19 @@
-# GHM.Result
+# GHM.HttpResult
 
-GHM.Result is nuget packed with the aim of typing http result.
+GHM.HttpResult is nuget packed with the aim of typing http result.
 
 ## Install Package
 
 .NET CLI
 
 ```sh
-dotnet add package GHM.Result --version 1.0.0
+dotnet add package GHM.HttpResult --version 1.0.0
 ```
 
 Package Manager
 
 ```sh
-NuGet\Install-Package GHM.Result -Version 1.0.0
+NuGet\Install-Package GHM.HttpResult -Version 1.0.0
 ```
 
 ## Exemple
