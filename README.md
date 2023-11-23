@@ -1,19 +1,19 @@
-# GHM.HttpResult
+# GHM.Result
 
-GHM.HttpResult is nuget packed with the aim of typing http result.
+GHM.Result is nuget packed with the aim of typing http result.
 
 ## Install Package
 
 .NET CLI
 
 ```sh
-dotnet add package GHM.HttpResult --version 1.0.0
+dotnet add package GHM.Result --version 1.0.0
 ```
 
 Package Manager
 
 ```sh
-NuGet\Install-Package GHM.HttpResult -Version 1.0.0
+NuGet\Install-Package GHM.Result -Version 1.0.0
 ```
 
 ## Exemple
@@ -24,13 +24,13 @@ The exemple presents a demo how this lib works. Focused on implicit operator to 
 public class UserService
 {
 
-    public HttpOk<User> GetUser(int id)
+    public Ok<User> GetUser(int id)
     {
         User user = _userRepo.GetUser(id);
 
         if(user is null)
         {
-            return HttpError.NotFound($"not found user by id {id}");
+            return Error.NotFound($"not found user by id {id}");
         }
         return user
     }
@@ -45,14 +45,14 @@ public class UserController : ControllerBase
     [HttpGet]
     public IActionResult GetUser(int id)
     {
-        HttpOk<User> result = _userService.GetUser(id);
+        Ok<User> result = _userService.GetUser(id);
         return ConvertExempleTest(result);// you can create a Converting from Result to Action automaticly
     }
 
     [HttpGet]
     public IActionResult GetUser(int id)
     {
-        HttpOk<User> result = _userService.GetUser(id);
+        Ok<User> result = _userService.GetUser(id);
         return result.Match(
             (data) => Ok(data),
             (errors) => BadRequest(errors)
@@ -64,23 +64,23 @@ public class UserController : ControllerBase
 
 ## Classes
 
-## HttpResult
+## Result
 
-Is a abstract class base to HttpOk, HttpCreated and HttpNoContent.
-`HttpResult` das the result base as Errors, StatusCode and Success property.
-`HttpResult<TData>` is based on HttpResult with data property
+Is a abstract class base to Ok, Created and NoContent.
+`Result` das the result base as Errors, StatusCode and IsSuccess property.
+`Result<TData>` is based on Result with data property
 
 ```csharp
-public abstract class HttpResult
+public abstract class Result
 {
-    public IReadOnlyList<HttpError> Errors { get; init; }
+    public IReadOnlyList<Error> Errors { get; init; }
 
     public HttpStatusCode StatusCode { get; init; }
 
     public bool IsSuccess => (int)StatusCode < 400;
 }
 
-public abstract class HttpResult<TData> : HttpResult
+public abstract class Result<TData> : Result
 {
     private readonly TData? _data;
 
@@ -92,24 +92,24 @@ public abstract class HttpResult<TData> : HttpResult
 
 type of HttpSuccess:
 
-- HttpOk
-- HttpCreated
-- HttpNoContent
+- Ok
+- Created
+- NoContent
 
 ```csharp
-public class HttpOk<TData> : HttpResult<TData> {}
-public class HttpOk : HttpResult<BasicResult> {}
+public class Ok<TData> : Result<TData> { }
+public class Ok : Result<BasicResponse> { }
 
-public class HttpCreated<TData> : HttpResult<TData> {}
-public class HttpCreated : HttpResult<BasicResult> {}
+public class Created<TData> : Result<TData> { }
+public class Created : Result<BasicResponse> { }
 
-public class HttpNoContent : HttpResult {}
+public class NoContent : Result { }
 
 ```
 
-## HttpError
+## Error
 
-It is only one HttpError type with different HttpStatusCode:
+It is only one Error type with different HttpStatusCode:
 
 - NotFound
 - Forbidden
@@ -118,26 +118,26 @@ It is only one HttpError type with different HttpStatusCode:
 - Conflict
 
 ```csharp
-public class HttpError
+public class Error
 {
     public string Title { get; init; }
     public HttpStatusCode StatusCode { get; init; }
 
-    private HttpError(string title, HttpStatusCode httpStatusCode)
+    private Error(string title, HttpStatusCode httpStatusCode)
     {
         Title = title;
         StatusCode = httpStatusCode;
     }
 
-    public static HttpError NotFound(string title) => new(title, HttpStatusCode.NotFound);
+    public static Error NotFound(string title) => new(title, HttpStatusCode.NotFound);
 
-    public static HttpError Forbidden(string title) => new(title, HttpStatusCode.Forbidden);
+    public static Error Forbidden(string title) => new(title, HttpStatusCode.Forbidden);
 
-    public static HttpError BadRequest(string title) => new(title, HttpStatusCode.BadRequest);
+    public static Error BadRequest(string title) => new(title, HttpStatusCode.BadRequest);
 
-    public static HttpError Unauthorized(string title) => new(title, HttpStatusCode.Unauthorized);
+    public static Error Unauthorized(string title) => new(title, HttpStatusCode.Unauthorized);
 
-    public static HttpError Conflict(string title) => new(title, HttpStatusCode.Conflict);
+    public static Error Conflict(string title) => new(title, HttpStatusCode.Conflict);
 }
 
 ```
