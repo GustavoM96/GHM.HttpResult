@@ -21,7 +21,8 @@ NuGet\Install-Package GHM.HttpResult -Version 1.0.0
 The exemple presents a demo how this lib works. Focused on implicit operator to easy all castings.
 
 ```csharp
-public class UserService{
+public class UserService
+{
 
     public HttpOk<User> GetUser(int id)
     {
@@ -38,13 +39,24 @@ public class UserService{
 ```
 
 ```csharp
-public class UserController{
+public class UserController : ControllerBase
+{
 
     [HttpGet]
     public IActionResult GetUser(int id)
     {
         HttpOk<User> result = _userService.GetUser(id);
-        return Ok(user.ToSuccess());// you can create a Converting from Result to Action automaticly
+        return ConvertExempleTest(result);// you can create a Converting from Result to Action automaticly
+    }
+
+    [HttpGet]
+    public IActionResult GetUser(int id)
+    {
+        HttpOk<User> result = _userService.GetUser(id);
+        return result.Match(
+            (data) => Ok(data),
+            (errors) => BadRequest(errors)
+        );// using a match pattern
     }
 }
 
