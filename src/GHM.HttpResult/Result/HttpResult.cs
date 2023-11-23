@@ -19,31 +19,45 @@ public abstract class HttpResult<TData> : HttpResult
 
     public HttpResult(List<Error> errors)
         : base(errors) { }
+
+    public SuccessResult<TData> ToSuccessResult() => new(Data, StatusCode);
+
+    public ErrorResult ToErrorResult()
+    {
+        if (!Errors.Any())
+        {
+            throw new ArgumentException("not found errors");
+        }
+
+        var title = Errors.Count == 1 ? Errors[0].Title : "many error has occured";
+
+        return new(title, StatusCode, Errors);
+    }
 }
 
 public abstract class HttpResult
 {
-    public IReadOnlyCollection<Error> Errors { get; init; }
+    public IReadOnlyList<Error> Errors { get; init; }
 
-    public HttpStatusCode HttpStatusCode { get; init; }
+    public HttpStatusCode StatusCode { get; init; }
 
-    public bool IsSuccess => (int)HttpStatusCode < 400;
+    public bool IsSuccess => (int)StatusCode < 400;
 
     public HttpResult(HttpStatusCode httpStatusCode)
     {
-        HttpStatusCode = httpStatusCode;
+        StatusCode = httpStatusCode;
         Errors = Array.Empty<Error>();
     }
 
     public HttpResult(Error error)
     {
-        HttpStatusCode = error.HttpStatusCode;
+        StatusCode = error.HttpStatusCode;
         Errors = new Error[1] { error };
     }
 
     public HttpResult(List<Error> errors)
     {
-        HttpStatusCode = errors.Count == 1 ? errors.First().HttpStatusCode : HttpStatusCode.BadRequest;
+        StatusCode = errors.Count == 1 ? errors.First().HttpStatusCode : HttpStatusCode.BadRequest;
         Errors = errors;
     }
 }

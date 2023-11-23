@@ -2,58 +2,56 @@
 
 namespace GHM.HttpResult.Result;
 
-public class OkResult<TData> : HttpResult<TData>
+public class HttpOk<TData> : HttpResult<TData>
 {
-    private OkResult(TData data)
+    private HttpOk(TData data)
         : base(data, HttpStatusCode.OK) { }
 
-    private OkResult(Error error)
+    private HttpOk(Error error)
         : base(error) { }
 
-    private OkResult(List<Error> errors)
+    private HttpOk(List<Error> errors)
         : base(errors) { }
 
-    public static implicit operator OkResult<TData>(TData data) => new(data);
+    public static implicit operator HttpOk<TData>(TData data) => new(data);
 
-    // public static implicit operator IActionResult(OkResult<TData> okResult) => "";
+    public static implicit operator HttpOk<TData>(Error error) => new(error);
 
-    public static implicit operator OkResult<TData>(Error error) => new(error);
-
-    public static implicit operator OkResult<TData>(List<Error> errors) => new(errors);
+    public static implicit operator HttpOk<TData>(List<Error> errors) => new(errors);
 }
 
-public class CreatedResult<TData> : HttpResult<TData>
+public class HttpCreated<TData> : HttpResult<TData>
 {
-    private CreatedResult(TData data)
+    private HttpCreated(TData data)
         : base(data, HttpStatusCode.Created) { }
 
-    private CreatedResult(Error error)
+    private HttpCreated(Error error)
         : base(error) { }
 
-    private CreatedResult(List<Error> errors)
+    private HttpCreated(List<Error> errors)
         : base(errors) { }
 
-    public static implicit operator CreatedResult<TData>(TData data) => new(data);
+    public static implicit operator HttpCreated<TData>(TData data) => new(data);
 
-    public static implicit operator CreatedResult<TData>(Error error) => new(error);
+    public static implicit operator HttpCreated<TData>(Error error) => new(error);
 
-    public static implicit operator CreatedResult<TData>(List<Error> errors) => new(errors);
+    public static implicit operator HttpCreated<TData>(List<Error> errors) => new(errors);
 }
 
-public class NoContentResult : HttpResult
+public class HttpNoContent : HttpResult
 {
-    public NoContentResult()
+    public HttpNoContent()
         : base(HttpStatusCode.NoContent) { }
 
-    private NoContentResult(Error error)
+    private HttpNoContent(Error error)
         : base(error) { }
 
-    private NoContentResult(List<Error> errors)
+    private HttpNoContent(List<Error> errors)
         : base(errors) { }
 
-    public static NoContentResult Success() => new();
+    public static HttpNoContent Success() => new();
 
-    public static implicit operator NoContentResult(Error error) => new(error);
+    public static implicit operator HttpNoContent(Error error) => new(error);
 
-    public static implicit operator NoContentResult(List<Error> errors) => new(errors);
+    public static implicit operator HttpNoContent(List<Error> errors) => new(errors);
 }
