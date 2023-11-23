@@ -22,20 +22,9 @@ public abstract class HttpResult<TData> : HttpResult
 
     public SuccessResult<TData> ToSuccessResult() => new(Data, StatusCode);
 
-    public ErrorResult ToErrorResult()
+    public TResult Match<TResult>(Func<SuccessResult<TData>, TResult> onSuccess, Func<ErrorResult, TResult> onError)
     {
-        if (!Errors.Any())
-        {
-            throw new ArgumentException("not found errors.");
-        }
-
-        var title = Errors.Count == 1 ? Errors[0].Title : "many error has occurred.";
-        return new(title, StatusCode, Errors);
-    }
-
-    public TResult Match<TResult>(Func<TData, TResult> onSuccess, Func<IReadOnlyList<HttpError>, TResult> onError)
-    {
-        return IsSuccess ? onSuccess(Data) : onError(Errors);
+        return IsSuccess ? onSuccess(ToSuccessResult()) : onError(ToErrorResult());
     }
 }
 
@@ -65,8 +54,19 @@ public abstract class HttpResult
         Errors = errors;
     }
 
-    public TResult Match<TResult>(Func<TResult> onSuccess, Func<IReadOnlyList<HttpError>, TResult> onError)
+    public ErrorResult ToErrorResult()
     {
-        return IsSuccess ? onSuccess() : onError(Errors);
+        if (!Errors.Any())
+        {
+            throw new ArgumentException("not found errors.");
+        }
+
+        var title = Errors.Count == 1 ? Errors[0].Title : "many error has occurred.";
+        return new(title, StatusCode, Errors);
+    }
+
+    public TResult Match<TResult>(Func<TResult> onSuccess, Func<ErrorResult, TResult> onError)
+    {
+        return IsSuccess ? onSuccess() : onError(ToErrorResult());
     }
 }

@@ -97,13 +97,13 @@ type of HttpSuccess:
 - HttpNoContent
 
 ```csharp
-public class HttpOk<TData> : HttpResult<TData>{}
+public class HttpOk<TData> : HttpResult<TData> {}
 public class HttpOk : HttpResult<BasicResult> {}
 
 public class HttpCreated<TData> : HttpResult<TData> {}
 public class HttpCreated : HttpResult<BasicResult> {}
 
-public class HttpNoContent : HttpResult{}
+public class HttpNoContent : HttpResult {}
 
 ```
 
