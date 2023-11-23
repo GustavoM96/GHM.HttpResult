@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Title>GHM Pipeline</Title>
+	<Version>1.0.1</Version>
+	<PackageId>GHM.HttpResult</PackageId>
+	<Authors>Gustavo Henrique Messias</Authors>
+	<Company>Gustavo Henrique Messias</Company>
+	<PackageTags>pipeline</PackageTags>
+	<Description>A package for pipeline management</Description>
+	<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	<PackageProjectUrl>https://github.com/GustavoM96/GHM.HttpResult</PackageProjectUrl>
+	<RepositoryUrl>https://github.com/GustavoM96/GHM.HttpResult</RepositoryUrl>
+	<RepositoryType>git</RepositoryType>
+	<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+	<PackageIcon>logo.png</PackageIcon>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+		<None Include="../../README.md" Pack="true" PackagePath="\" />
+		<None Include="../../logo.png" Pack="true" PackagePath="\" />
+	</ItemGroup>
+
+</Project>
