@@ -2,22 +2,22 @@
 
 namespace GHM.HttpResult;
 
-public abstract class HttpResult<TData> : HttpResult
+public abstract class Result<TData> : Result
 {
     private readonly TData? _data;
 
     public TData Data => IsSuccess ? _data! : throw new ArgumentException("http error has no data.");
 
-    public HttpResult(TData data, HttpStatusCode statusCode)
+    public Result(TData data, HttpStatusCode statusCode)
         : base(statusCode)
     {
         _data = data;
     }
 
-    public HttpResult(HttpError error)
+    public Result(Error error)
         : base(error) { }
 
-    public HttpResult(List<HttpError> errors)
+    public Result(List<Error> errors)
         : base(errors) { }
 
     public SuccessResult<TData> ToSuccessResult() => new(Data, StatusCode);
@@ -28,27 +28,27 @@ public abstract class HttpResult<TData> : HttpResult
     }
 }
 
-public abstract class HttpResult
+public abstract class Result
 {
-    public IReadOnlyList<HttpError> Errors { get; init; }
+    public IReadOnlyList<Error> Errors { get; init; }
 
     public HttpStatusCode StatusCode { get; init; }
 
     public bool IsSuccess => (int)StatusCode < 400;
 
-    public HttpResult(HttpStatusCode statusCode)
+    public Result(HttpStatusCode statusCode)
     {
         StatusCode = statusCode;
-        Errors = Array.Empty<HttpError>();
+        Errors = Array.Empty<Error>();
     }
 
-    public HttpResult(HttpError error)
+    public Result(Error error)
     {
         StatusCode = error.StatusCode;
-        Errors = new HttpError[1] { error };
+        Errors = new Error[1] { error };
     }
 
-    public HttpResult(List<HttpError> errors)
+    public Result(List<Error> errors)
     {
         StatusCode = errors.Count == 1 ? errors.First().StatusCode : HttpStatusCode.BadRequest;
         Errors = errors;
