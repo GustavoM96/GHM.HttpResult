@@ -1,16 +1,16 @@
 ﻿using System.Net;
 
-namespace GHM.HttpResult.Result;
+namespace GHM.HttpResult;
 
 public class Error
 {
     public string Title { get; init; }
-    public HttpStatusCode HttpStatusCode { get; init; }
+    public HttpStatusCode StatusCode { get; init; }
 
     private Error(string title, HttpStatusCode httpStatusCode)
     {
         Title = title;
-        HttpStatusCode = httpStatusCode;
+        StatusCode = httpStatusCode;
     }
 
     public static Error NotFound(string title) => new(title, HttpStatusCode.NotFound);

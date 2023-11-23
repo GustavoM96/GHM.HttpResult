@@ -8,8 +8,8 @@ public abstract class HttpResult<TData> : HttpResult
 
     public TData Data => IsSuccess ? throw new ArgumentException("http error has no data") : _data!;
 
-    public HttpResult(TData data, HttpStatusCode httpStatusCode)
-        : base(httpStatusCode)
+    public HttpResult(TData data, HttpStatusCode statusCode)
+        : base(statusCode)
     {
         _data = data;
     }
@@ -42,21 +42,21 @@ public abstract class HttpResult
 
     public bool IsSuccess => (int)StatusCode < 400;
 
-    public HttpResult(HttpStatusCode httpStatusCode)
+    public HttpResult(HttpStatusCode statusCode)
     {
-        StatusCode = httpStatusCode;
+        StatusCode = statusCode;
         Errors = Array.Empty<Error>();
     }
 
     public HttpResult(Error error)
     {
-        StatusCode = error.HttpStatusCode;
+        StatusCode = error.StatusCode;
         Errors = new Error[1] { error };
     }
 
     public HttpResult(List<Error> errors)
     {
-        StatusCode = errors.Count == 1 ? errors.First().HttpStatusCode : HttpStatusCode.BadRequest;
+        StatusCode = errors.Count == 1 ? errors.First().StatusCode : HttpStatusCode.BadRequest;
         Errors = errors;
     }
 }
