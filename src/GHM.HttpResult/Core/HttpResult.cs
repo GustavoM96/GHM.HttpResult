@@ -6,7 +6,7 @@ public abstract class HttpResult<TData> : HttpResult
 {
     private readonly TData? _data;
 
-    public TData Data => IsSuccess ? throw new ArgumentException("http error has no data.") : _data!;
+    public TData Data => IsSuccess ? _data! : throw new ArgumentException("http error has no data.");
 
     public HttpResult(TData data, HttpStatusCode statusCode)
         : base(statusCode)
