@@ -1,11 +1,10 @@
-using GHM.HttpResult.Result;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GHM.HttpResult.Extentions;
 
 public static class HttpResultExtensions
 {
-    public static ActionResult ToActionResult<TData>(this HttpResult<TData> result)
+    public static ActionResult ToObjectResult<TData>(this HttpResult<TData> result)
     {
         if (result.IsSuccess)
         {

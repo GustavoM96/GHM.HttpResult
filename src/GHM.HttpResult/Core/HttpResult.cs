@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace GHM.HttpResult.Result;
+namespace GHM.HttpResult;
 
 public abstract class HttpResult<TData> : HttpResult
 {
@@ -30,7 +30,6 @@ public abstract class HttpResult<TData> : HttpResult
         }
 
         var title = Errors.Count == 1 ? Errors[0].Title : "many error has occured";
-
         return new(title, StatusCode, Errors);
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace GHM.HttpResult.Result;
+namespace GHM.HttpResult;
 
 public class HttpOk<TData> : HttpResult<TData>
 {
