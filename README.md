@@ -18,7 +18,7 @@ NuGet\Install-Package GHM.Result -Version 1.0.0
 
 ## Exemple
 
-The exemple presents a demo how this lib works. Focused on implicit operator to easy all castings.
+The exemple presents a demo of how this lib works. Focused on implicit operator to facilitate all castings.
 
 ```csharp
 public class UserService
@@ -67,7 +67,7 @@ public class UserController : ControllerBase
 ## Result
 
 Is a abstract class base to Ok, Created and NoContent.
-`Result` das the result base as Errors, StatusCode and IsSuccess property.
+`Result` has the result base as Errors, StatusCode and IsSuccess property.
 `Result<TData>` is based on Result with data property
 
 ```csharp
