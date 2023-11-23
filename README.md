@@ -1,6 +1,6 @@
 # GHM.HttpResult
 
-GHM.HttpResult is nuget packed with the aim of typing http result.
+GHM.HttpResult is nuget packege with the aim of typing http result.
 
 ## Install Package
 
