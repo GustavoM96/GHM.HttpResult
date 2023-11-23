@@ -32,6 +32,11 @@ public abstract class HttpResult<TData> : HttpResult
         var title = Errors.Count == 1 ? Errors[0].Title : "many error has occurred.";
         return new(title, StatusCode, Errors);
     }
+
+    public TResult Match<TResult>(Func<TData, TResult> onSuccess, Func<IReadOnlyList<HttpError>, TResult> onError)
+    {
+        return IsSuccess ? onSuccess(Data) : onError(Errors);
+    }
 }
 
 public abstract class HttpResult
@@ -58,5 +63,10 @@ public abstract class HttpResult
     {
         StatusCode = errors.Count == 1 ? errors.First().StatusCode : HttpStatusCode.BadRequest;
         Errors = errors;
+    }
+
+    public TResult Match<TResult>(Func<TResult> onSuccess, Func<IReadOnlyList<HttpError>, TResult> onError)
+    {
+        return IsSuccess ? onSuccess() : onError(Errors);
     }
 }
