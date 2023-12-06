@@ -1,6 +1,10 @@
-# GHM.HttpResult
+<p align="center">
+<img src="logo.png" alt="logo" width="200px"/>
+</p>
 
-GHM.HttpResult is nuget packege with the aim of typing http result.
+<h1 align="center"> GHM.HTTPResult </h1>
+
+GHM.HTTPResult aims to type the HTTP result of your API service or others.
 
 ## Install Package
 
@@ -16,11 +20,12 @@ Package Manager
 NuGet\Install-Package GHM.HttpResult -Version 1.0.0
 ```
 
-## Exemple
+## Example
 
-The exemple presents a demo of how this lib works. Focused on implicit operator to facilitate all castings.
+This lib has been created to improve description of method returns called, and facilitating the casting of success and error cases
 
 ```csharp
+using GHM.HTTPResult
 public class UserService
 {
 
@@ -39,6 +44,7 @@ public class UserService
 ```
 
 ```csharp
+using GHM.HTTPResult
 public class UserController : ControllerBase
 {
 
@@ -46,13 +52,15 @@ public class UserController : ControllerBase
     public IActionResult GetUser(int id)
     {
         Ok<User> result = _userService.GetUser(id);
-        return ConvertExempleTest(result);// you can create a Converting from Result to Action automaticly
+
+        return ConvertExempleTest(result);// you can create a Converter to change return from Result to Action automaticly
     }
 
     [HttpGet]
     public IActionResult GetUser(int id)
     {
         Ok<User> result = _userService.GetUser(id);
+
         return result.Match(
             (data) => Ok(data),
             (errors) => BadRequest(errors)
@@ -64,33 +72,9 @@ public class UserController : ControllerBase
 
 ## Classes
 
-## Result
+### HttpSuccess
 
-Is a abstract class base to Ok, Created and NoContent.
-`Result` has the result base as Errors, StatusCode and IsSuccess property.
-`Result<TData>` is based on Result with data property
-
-```csharp
-public abstract class Result
-{
-    public IReadOnlyList<Error> Errors { get; init; }
-
-    public HttpStatusCode StatusCode { get; init; }
-
-    public bool IsSuccess => (int)StatusCode < 400;
-}
-
-public abstract class Result<TData> : Result
-{
-    private readonly TData? _data;
-
-    public TData Data => IsSuccess ? _data! : throw new ArgumentException("http error has no data.");
-}
-```
-
-## HttpSuccess
-
-type of HttpSuccess:
+Type of HttpSuccess:
 
 - Ok
 - Created
@@ -107,9 +91,9 @@ public class NoContent : Result { }
 
 ```
 
-## Error
+### Error
 
-It is only one Error type with different HttpStatusCode:
+It's just one type of error with different HttpStatusCode:
 
 - NotFound
 - Forbidden
@@ -140,6 +124,36 @@ public class Error
     public static Error Conflict(string title) => new(title, HttpStatusCode.Conflict);
 }
 
+```
+
+### Result
+
+A abstract class base for Ok, Created and NoContent classes.
+`Result` has properties base as Errors, StatusCode and IsSuccess.
+`Result<TData>` is based on Result with data property
+
+```csharp
+public abstract class Result
+{
+    public IReadOnlyList<Error> Errors { get; init; }
+
+    public HttpStatusCode StatusCode { get; init; }
+
+    public bool IsSuccess => (int)StatusCode < 400;
+}
+```
+
+### Result\<Data\>
+
+`Result<TData>` is based on Result with data property
+
+```csharp
+public abstract class Result<TData> : Result
+{
+    private readonly TData? _data;
+
+    public TData Data => IsSuccess ? _data! : throw new ArgumentException("http error has no data.");
+}
 ```
 
 ## Star
