@@ -25,7 +25,8 @@ NuGet\Install-Package GHM.HttpResult -Version 1.0.0
 This lib has been created to improve description of method returns called, and facilitating the casting of success and error cases
 
 ```csharp
-using GHM.HTTPResult
+using GHM.HTTPResult;
+
 public class UserService
 {
 
@@ -44,7 +45,8 @@ public class UserService
 ```
 
 ```csharp
-using GHM.HTTPResult
+using GHM.HTTPResult;
+
 public class UserController : ControllerBase
 {
 
