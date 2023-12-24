@@ -25,7 +25,7 @@ public class Ok<TData> : Result<TData>
         return this;
     }
 
-    public Ok<TData> ErrorIf(Func<TData, Result> action)
+    public Ok<TData> Bind(Func<TData, Result> action)
     {
         var result = action(Data);
         if (!result.IsSuccess)
@@ -37,14 +37,8 @@ public class Ok<TData> : Result<TData>
 
     public Ok<T> Map<T>(Func<TData, T> action)
     {
-        var result = action(Data);
-        return new Ok<T>(result);
-    }
-
-    public Ok<TData> Bind(Func<TData, Result<TData>> action)
-    {
-        var result = action(Data);
-        return new(result.Data, result.Errors.ToList());
+        var data = action(Data);
+        return new(data, Errors.ToList());
     }
 
     public static implicit operator Ok<TData>(TData data) => new(data);

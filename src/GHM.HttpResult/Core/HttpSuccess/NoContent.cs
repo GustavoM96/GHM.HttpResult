@@ -31,7 +31,7 @@ public class NoContent<TData> : NoContent
         return this;
     }
 
-    public NoContent<TData> ErrorIf(Func<TData, Result> action)
+    public NoContent<TData> Bind(Func<TData, Result> action)
     {
         var result = action(Data);
         if (!result.IsSuccess)
@@ -41,16 +41,10 @@ public class NoContent<TData> : NoContent
         return this;
     }
 
-    public NoContent<TData> Bind(Func<TData, Result<TData>> action)
-    {
-        var result = action(Data);
-        return new(result.Data, result.Errors.ToList());
-    }
-
     public NoContent<T> Map<T>(Func<TData, T> action)
     {
-        var result = action(Data);
-        return new(result);
+        var data = action(Data);
+        return new(data, Errors.ToList());
     }
 }
 
