@@ -2,11 +2,11 @@
 
 namespace GHM.HttpResult;
 
-public abstract class Result<TData> : Result
+public class Result<TData> : Result
 {
     private readonly TData? _data;
 
-    public TData Data => IsSuccess ? _data! : throw new ArgumentException("http error has no data.");
+    public TData Data => _data!;
 
     public Result(TData data, HttpStatusCode statusCode)
         : base(statusCode)
@@ -17,8 +17,14 @@ public abstract class Result<TData> : Result
     public Result(Error error)
         : base(error) { }
 
-    public Result(List<Error> errors)
-        : base(errors) { }
+    public Result(TData data, List<Error> errors, HttpStatusCode statusCode)
+        : base(errors, statusCode)
+    {
+        _data = data;
+    }
+
+    public Result(List<Error> errors, HttpStatusCode statusCode)
+        : base(errors, statusCode) { }
 
     public SuccessResult<TData> ToSuccessResult() => new(Data, StatusCode);
 
@@ -28,31 +34,42 @@ public abstract class Result<TData> : Result
     }
 }
 
-public abstract class Result
+public class Result
 {
-    public IReadOnlyList<Error> Errors { get; init; }
+    private readonly List<Error> _errors;
+    public IReadOnlyList<Error> Errors => _errors;
 
-    public HttpStatusCode StatusCode { get; init; }
+    public HttpStatusCode StatusCode { get; private set; }
 
     public bool IsSuccess => (int)StatusCode < 400;
 
     public Result(HttpStatusCode statusCode)
     {
         StatusCode = statusCode;
-        Errors = Array.Empty<Error>();
+        _errors = new List<Error> { };
+    }
+
+    public Result(IEnumerable<Error> errors, HttpStatusCode statusCode)
+    {
+        StatusCode = errors.Any() ? errors.First().StatusCode : statusCode;
+        _errors = errors.ToList();
     }
 
     public Result(Error error)
     {
         StatusCode = error.StatusCode;
-        Errors = new Error[1] { error };
+        _errors = new List<Error> { error };
     }
 
-    public Result(List<Error> errors)
+    protected void AddErrors(IEnumerable<Error> errors)
     {
-        StatusCode = errors.Count == 1 ? errors.First().StatusCode : HttpStatusCode.BadRequest;
-        Errors = errors;
+        StatusCode = errors.Any() ? errors.First().StatusCode : HttpStatusCode.BadRequest;
+        _errors.AddRange(errors.ToList());
     }
+
+    public static Result Successful => new(HttpStatusCode.OK);
+
+    public static ValidationError Validate(bool isError) => new(isError);
 
     public ErrorResult ToErrorResult()
     {
