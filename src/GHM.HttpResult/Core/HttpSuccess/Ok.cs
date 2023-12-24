@@ -25,7 +25,17 @@ public class Ok<TData> : Result<TData>
         return this;
     }
 
-    public Ok<TData> Bind(Func<TData, Result> action)
+    public Ok<T> BindData<T>(Func<TData, T> action)
+    {
+        if (IsSuccess)
+        {
+            var data = action(Data);
+            return new(data);
+        }
+        return new(Errors.ToList());
+    }
+
+    public Ok<TData> BindError(Func<TData, Result> action)
     {
         var result = action(Data);
         if (!result.IsSuccess)

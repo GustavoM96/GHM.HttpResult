@@ -25,7 +25,17 @@ public class Created<TData> : Result<TData>
         return this;
     }
 
-    public Created<TData> Bind(Func<TData, Result> action)
+    public Created<T> BindData<T>(Func<TData, T> action)
+    {
+        if (IsSuccess)
+        {
+            var data = action(Data);
+            return new(data);
+        }
+        return new(Errors.ToList());
+    }
+
+    public Created<TData> BindError(Func<TData, Result> action)
     {
         var result = action(Data);
         if (!result.IsSuccess)

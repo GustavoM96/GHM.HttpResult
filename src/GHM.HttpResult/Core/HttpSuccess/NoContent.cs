@@ -31,7 +31,17 @@ public class NoContent<TData> : NoContent
         return this;
     }
 
-    public NoContent<TData> Bind(Func<TData, Result> action)
+    public NoContent<T> BindData<T>(Func<TData, T> action)
+    {
+        if (IsSuccess)
+        {
+            var data = action(Data);
+            return new(data);
+        }
+        return new(Errors.ToList());
+    }
+
+    public NoContent<TData> BindError(Func<TData, Result> action)
     {
         var result = action(Data);
         if (!result.IsSuccess)
