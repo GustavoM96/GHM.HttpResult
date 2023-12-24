@@ -25,39 +25,20 @@ public class Created<TData> : Result<TData>
         return this;
     }
 
-    public Created<TData> Tap(Func<TData, Result<TData>> action)
-    {
-        if (IsSuccess)
-        {
-            var result = action(Data);
-            return new(result.Data, result.Errors.ToList());
-        }
-
-        return this;
-    }
-
-    public Created<TData> Bind(Func<TData, Result<TData>> action)
+    public Created<TData> Bind(Func<TData, Result> action)
     {
         var result = action(Data);
-        return new(result.Data, result.Errors.ToList());
+        if (!result.IsSuccess)
+        {
+            AddErrors(result.Errors);
+        }
+        return this;
     }
 
     public Created<T> Map<T>(Func<TData, T> action)
     {
         var data = action(Data);
         return new(data, Errors.ToList());
-    }
-
-    public Created<TData> Check<T>(Func<TData, Result<T>> action)
-    {
-        var result = action(Data);
-
-        if (!result.IsSuccess)
-        {
-            AddErrors(result.Errors);
-        }
-
-        return this;
     }
 
     public static implicit operator Created<TData>(TData data) => new(data);
