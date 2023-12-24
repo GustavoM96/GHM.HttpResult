@@ -30,7 +30,7 @@ public class Created<TData> : Result<TData>
         if (IsSuccess)
         {
             var result = action(Data);
-            return new(result.Data,result.Errors.ToList());
+            return new(result.Data, result.Errors.ToList());
         }
 
         return this;
@@ -39,26 +39,26 @@ public class Created<TData> : Result<TData>
     public Created<TData> Bind(Func<TData, Result<TData>> action)
     {
         var result = action(Data);
-        return new(result.Data,result.Errors.ToList());
-    }
-
-    public Created<TData> ErrorIf(Func<TData, Result> action)
-    {
-        var result = action(Data);
-        if (!result.IsSuccess)
-        {
-            AddErrors(result.Errors);
-        }
-        return this;
+        return new(result.Data, result.Errors.ToList());
     }
 
     public Created<T> Map<T>(Func<TData, T> action)
     {
-        var result = action(Data);
-        return new(result,Errors.ToList());
+        var data = action(Data);
+        return new(data, Errors.ToList());
     }
 
+    public Created<TData> Check<T>(Func<TData, Result<T>> action)
+    {
+        var result = action(Data);
 
+        if (!result.IsSuccess)
+        {
+            AddErrors(result.Errors);
+        }
+
+        return this;
+    }
 
     public static implicit operator Created<TData>(TData data) => new(data);
 

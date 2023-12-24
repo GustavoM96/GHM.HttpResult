@@ -63,7 +63,7 @@ public class NoContent : Result
         : base(error) { }
 
     public NoContent(List<Error> errors)
-        : base(errors,HttpStatusCode.NoContent) { }
+        : base(errors, HttpStatusCode.NoContent) { }
 
     public static NoContent<TData> Create<TData>(TData data) => new(data);
 
