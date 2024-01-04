@@ -27,37 +27,26 @@ public class NoContent<TData> : NoContent
 
     public NoContent<TData> Tap(Action<TData> action)
     {
-        if (IsSuccess)
-        {
-            action(Data);
-        }
+        TapResult(action, Data);
         return this;
     }
 
     public NoContent<T> BindData<T>(Func<TData, T> action)
     {
-        if (IsSuccess)
-        {
-            var data = action(Data);
-            return new(data);
-        }
-        return new(Errors.ToList());
+        var result = BindDataResult(action, Data);
+        return result.Success ? new(result.Data!) : new(Errors.ToList());
     }
 
     public NoContent<TData> BindError(Func<TData, Result> action)
     {
-        var result = action(Data);
-        if (!result.IsSuccess)
-        {
-            AddErrors(result.Errors);
-        }
+        BindErrorResult(action, Data);
         return this;
     }
 
     public NoContent<T> Map<T>(Func<TData, T> action)
     {
-        var data = action(Data);
-        return new(data, Errors);
+        var result = MapResult(action, Data);
+        return result.Success ? new(result.Data!) : new(Errors.ToList());
     }
 
     public SuccessResult<TData> ToSuccessResult() => new(Data, StatusCode);
@@ -66,8 +55,6 @@ public class NoContent<TData> : NoContent
     {
         return IsSuccess ? onSuccess(ToSuccessResult()) : onError(ToErrorResult());
     }
-
-    public NoContent ToNoContent() => new(Errors);
 
     public static implicit operator NoContent<TData>(TData data) => new(data);
 

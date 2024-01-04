@@ -27,37 +27,26 @@ public class Created<TData> : Created
 
     public Created<TData> Tap(Action<TData> action)
     {
-        if (IsSuccess)
-        {
-            action(Data);
-        }
+        TapResult(action, Data);
         return this;
     }
 
     public Created<T> BindData<T>(Func<TData, T> action)
     {
-        if (IsSuccess)
-        {
-            var data = action(Data);
-            return new(data);
-        }
-        return new(Errors.ToList());
+        var result = BindDataResult(action, Data);
+        return result.Success ? new(result.Data!) : new(Errors.ToList());
     }
 
     public Created<TData> BindError(Func<TData, Result> action)
     {
-        var result = action(Data);
-        if (!result.IsSuccess)
-        {
-            AddErrors(result.Errors);
-        }
+        BindErrorResult(action, Data);
         return this;
     }
 
     public Created<T> Map<T>(Func<TData, T> action)
     {
-        var data = action(Data);
-        return new(data, Errors);
+        var result = MapResult(action, Data);
+        return result.Success ? new(result.Data!) : new(Errors.ToList());
     }
 
     public SuccessResult<TData> ToSuccessResult() => new(Data, StatusCode);
@@ -66,8 +55,6 @@ public class Created<TData> : Created
     {
         return IsSuccess ? onSuccess(ToSuccessResult()) : onError(ToErrorResult());
     }
-
-    public Created ToCreated() => new(Errors);
 
     public static implicit operator Created<TData>(TData data) => new(data);
 

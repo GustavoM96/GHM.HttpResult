@@ -54,4 +54,47 @@ public class Result
     {
         return IsSuccess ? onSuccess() : onError(ToErrorResult());
     }
+
+    protected void TapResult<TData>(Action<TData> action, TData data)
+    {
+        if (IsSuccess)
+        {
+            action(data);
+        }
+    }
+
+    protected (T? Data, bool Success) BindDataResult<TData, T>(Func<TData, T> action, TData data)
+    {
+        if (IsSuccess)
+        {
+            var newData = action(data);
+            return (newData, true);
+        }
+        return (default, false);
+    }
+
+    protected void BindErrorResult<TData>(Func<TData, Result> action, TData data)
+    {
+        if (data is null)
+        {
+            return;
+        }
+
+        var result = action(data);
+        if (!result.IsSuccess)
+        {
+            AddErrors(result.Errors);
+        }
+    }
+
+    protected static (T? Data, bool Success) MapResult<TData, T>(Func<TData, T> action, TData data)
+    {
+        if (data is null)
+        {
+            return (default, false);
+        }
+
+        var newData = action(data);
+        return (newData, true);
+    }
 }

@@ -27,37 +27,26 @@ public class Ok<TData> : Ok
 
     public Ok<TData> Tap(Action<TData> action)
     {
-        if (IsSuccess)
-        {
-            action(Data);
-        }
+        TapResult(action, Data);
         return this;
     }
 
     public Ok<T> BindData<T>(Func<TData, T> action)
     {
-        if (IsSuccess)
-        {
-            var data = action(Data);
-            return new(data);
-        }
-        return new(Errors.ToList());
+        var result = BindDataResult(action, Data);
+        return result.Success ? new(result.Data!) : new(Errors.ToList());
     }
 
     public Ok<TData> BindError(Func<TData, Result> action)
     {
-        var result = action(Data);
-        if (!result.IsSuccess)
-        {
-            AddErrors(result.Errors);
-        }
+        BindErrorResult(action, Data);
         return this;
     }
 
     public Ok<T> Map<T>(Func<TData, T> action)
     {
-        var data = action(Data);
-        return new(data, Errors.ToList());
+        var result = MapResult(action, Data);
+        return result.Success ? new(result.Data!) : new(Errors.ToList());
     }
 
     public SuccessResult<TData> ToSuccessResult() => new(Data, StatusCode);
@@ -66,8 +55,6 @@ public class Ok<TData> : Ok
     {
         return IsSuccess ? onSuccess(ToSuccessResult()) : onError(ToErrorResult());
     }
-
-    public Ok ToOk() => new(Errors.ToList());
 
     public static implicit operator Ok<TData>(TData data) => new(data);
 
