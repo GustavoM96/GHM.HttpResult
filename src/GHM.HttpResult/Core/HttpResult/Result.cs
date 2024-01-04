@@ -2,38 +2,6 @@
 
 namespace GHM.HttpResult;
 
-public class Result<TData> : Result
-{
-    private readonly TData? _data;
-
-    public TData Data => _data!;
-
-    public Result(TData data, HttpStatusCode statusCode)
-        : base(statusCode)
-    {
-        _data = data;
-    }
-
-    public Result(Error error)
-        : base(error) { }
-
-    public Result(TData data, List<Error> errors, HttpStatusCode statusCode)
-        : base(errors, statusCode)
-    {
-        _data = data;
-    }
-
-    public Result(List<Error> errors, HttpStatusCode statusCode)
-        : base(errors, statusCode) { }
-
-    public SuccessResult<TData> ToSuccessResult() => new(Data, StatusCode);
-
-    public TResult Match<TResult>(Func<SuccessResult<TData>, TResult> onSuccess, Func<ErrorResult, TResult> onError)
-    {
-        return IsSuccess ? onSuccess(ToSuccessResult()) : onError(ToErrorResult());
-    }
-}
-
 public class Result
 {
     private readonly List<Error> _errors;
