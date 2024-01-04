@@ -34,7 +34,7 @@ public class NoContent<TData> : NoContent
     public NoContent<T> BindData<T>(Func<TData, T> action)
     {
         var result = BindDataResult(action, Data);
-        return result.Success ? new(result.Data!) : new(Errors.ToList());
+        return result.Success ? new(result.Data!) : new(Errors);
     }
 
     public NoContent<TData> BindError(Func<TData, Result> action)
@@ -43,10 +43,16 @@ public class NoContent<TData> : NoContent
         return this;
     }
 
+    public NoContent<TData> BindError(bool isError, Error error)
+    {
+        BindErrorResult(isError, error);
+        return this;
+    }
+
     public NoContent<T> Map<T>(Func<TData, T> action)
     {
         var result = MapResult(action, Data);
-        return result.Success ? new(result.Data!) : new(Errors.ToList());
+        return result.Success ? new(result.Data!) : new(Errors);
     }
 
     public SuccessResult<TData> ToSuccessResult() => new(Data, StatusCode);

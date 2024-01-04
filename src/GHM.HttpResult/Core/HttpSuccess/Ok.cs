@@ -34,7 +34,7 @@ public class Ok<TData> : Ok
     public Ok<T> BindData<T>(Func<TData, T> action)
     {
         var result = BindDataResult(action, Data);
-        return result.Success ? new(result.Data!) : new(Errors.ToList());
+        return result.Success ? new(result.Data!) : new(Errors);
     }
 
     public Ok<TData> BindError(Func<TData, Result> action)
@@ -43,10 +43,16 @@ public class Ok<TData> : Ok
         return this;
     }
 
+    public Ok<TData> BindError(bool isError, Error error)
+    {
+        BindErrorResult(isError, error);
+        return this;
+    }
+
     public Ok<T> Map<T>(Func<TData, T> action)
     {
         var result = MapResult(action, Data);
-        return result.Success ? new(result.Data!) : new(Errors.ToList());
+        return result.Success ? new(result.Data!) : new(Errors);
     }
 
     public SuccessResult<TData> ToSuccessResult() => new(Data, StatusCode);

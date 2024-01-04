@@ -35,6 +35,12 @@ public class Result
         _errors.AddRange(errors.ToList());
     }
 
+    protected void AddError(Error error)
+    {
+        StatusCode = error.StatusCode;
+        _errors.Add(error);
+    }
+
     public static Result Successful => new(HttpStatusCode.OK);
 
     public static ValidationError Validate(bool isError) => new(isError);
@@ -84,6 +90,14 @@ public class Result
         if (!result.IsSuccess)
         {
             AddErrors(result.Errors);
+        }
+    }
+
+    protected void BindErrorResult(bool isError, Error error)
+    {
+        if (isError)
+        {
+            AddError(error);
         }
     }
 
