@@ -17,10 +17,20 @@ public class Result
         _errors = new List<Error> { };
     }
 
+    private HttpStatusCode SetStatus(List<Error> errors, HttpStatusCode statusCode)
+    {
+        if (errors.Count > 1)
+        {
+            return HttpStatusCode.BadRequest;
+        }
+
+        return errors.FirstOrDefault()?.StatusCode ?? statusCode;
+    }
+
     public Result(IEnumerable<Error> errors, HttpStatusCode statusCode)
     {
-        StatusCode = errors.Any() ? errors.First().StatusCode : statusCode;
         _errors = errors.ToList();
+        StatusCode = SetStatus(_errors, statusCode);
     }
 
     public Result(Error error)
@@ -31,14 +41,14 @@ public class Result
 
     protected void AddErrors(IEnumerable<Error> errors)
     {
-        StatusCode = errors.Any() ? errors.First().StatusCode : HttpStatusCode.BadRequest;
         _errors.AddRange(errors.ToList());
+        StatusCode = SetStatus(_errors, HttpStatusCode.BadRequest);
     }
 
     protected void AddError(Error error)
     {
-        StatusCode = error.StatusCode;
         _errors.Add(error);
+        StatusCode = SetStatus(_errors, HttpStatusCode.BadRequest);
     }
 
     public static Result Successful => new(HttpStatusCode.OK);

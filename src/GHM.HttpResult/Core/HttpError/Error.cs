@@ -2,7 +2,7 @@
 
 namespace GHM.HttpResult;
 
-public class Error
+public record Error
 {
     public string Title { get; init; }
     public HttpStatusCode StatusCode { get; init; }

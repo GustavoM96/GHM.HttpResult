@@ -12,12 +12,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GHM.HttpResult.Test", "tests\GHM.HttpResult.Test\GHM.HttpResult.Test.csproj", "{E6011848-2C99-4894-8F91-0F90D43FDF08}"
 EndProject
 Global
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {9828BF01-780B-4A67-8E1D-403FA6D5E6BE}
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|x64 = Debug|x64
@@ -52,8 +46,14 @@ Global
 		{E6011848-2C99-4894-8F91-0F90D43FDF08}.Release|x86.ActiveCfg = Release|Any CPU
 		{E6011848-2C99-4894-8F91-0F90D43FDF08}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{2566F6C9-B412-41F5-8DCB-889AA6958D9F} = {BED6CD40-3473-4FBF-BF95-738AFC27B75E}
 		{E6011848-2C99-4894-8F91-0F90D43FDF08} = {630264BD-51C9-4032-BC4E-9BD7F6113F14}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9828BF01-780B-4A67-8E1D-403FA6D5E6BE}
 	EndGlobalSection
 EndGlobal
