@@ -125,6 +125,34 @@ public class ResultTests
     }
 
     [Fact]
+    public async Task Test_TapAsync_When_IsSuccessTrue_ShouldRun_Action()
+    {
+        // Arrange
+        var dataCopy = "";
+        Task CopyData(string data) => Task.FromResult(dataCopy = data);
+
+        // Act
+        await _createdDataResult.TapAsync(CopyData);
+
+        // Assert
+        Assert.Equal("created correctly", dataCopy);
+    }
+
+    [Fact]
+    public async Task Test_TapAsync_When_IsSuccessFalse_ShouldNotRun_Action()
+    {
+        // Arrange
+        var dataCopy = "";
+        Task CopyData(string data) => Task.FromResult(dataCopy = data);
+
+        // Act
+        await _errorCreatedDataResult.TapAsync(CopyData);
+
+        // Assert
+        Assert.Equal("", dataCopy);
+    }
+
+    [Fact]
     public void Test_BindData_When_IsSuccessTrue_ShouldReturn_ActionResult()
     {
         // Arrange
@@ -145,6 +173,32 @@ public class ResultTests
 
         // Act
         var result = _errorCreatedDataResult.BindData(NewData);
+
+        // Assert
+        Assert.Null(result.Data);
+    }
+
+    [Fact]
+    public async Task Test_BindDataAsync_When_IsSuccessTrue_ShouldReturn_ActionResult()
+    {
+        // Arrange
+        static Task<string> NewData(string data) => Task.FromResult(data + "_new");
+
+        // Act
+        var result = await _createdDataResult.BindDataAsync(NewData);
+
+        // Assert
+        Assert.Equal("created correctly_new", result.Data);
+    }
+
+    [Fact]
+    public async Task Test_BindDataAsync_When_IsSuccessFalse_ShouldNotReturn_ActionResult()
+    {
+        // Arrange
+        static Task<string> NewData(string data) => Task.FromResult(data + "_new");
+
+        // Act
+        var result = await _errorCreatedDataResult.BindDataAsync(NewData);
 
         // Assert
         Assert.Null(result.Data);
@@ -177,12 +231,15 @@ public class ResultTests
     }
 
     [Fact]
-    public void Test_BindError_Should_AddErrorByParamValue()
+    public async Task Test_BindErrorAsync_Should_AddErrorByParamValue()
     {
         // Arrange
+        Task<Result> GetErrorResult(string data) => Task.FromResult(new Result(_conflictError));
+        Task<Result> GetSuccessResult(string data) => Task.FromResult(Result.Successful);
+
         // Act
-        var successResult = _createdDataResult.BindError(false, _conflictError);
-        var errorResult = _createdDataResult.BindError(true, _conflictError);
+        var successResult = await _createdDataResult.BindErrorAsync(GetSuccessResult);
+        var errorResult = await _createdDataResult.BindErrorAsync(GetErrorResult);
 
         // Assert
         Assert.Equal(_conflictError, errorResult.Errors[0]);
