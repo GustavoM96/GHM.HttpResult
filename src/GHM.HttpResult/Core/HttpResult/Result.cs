@@ -79,7 +79,7 @@ public class Result
         }
     }
 
-    protected async Task TapResult<TData>(Func<TData, Task> action, TData data)
+    protected async Task TapResultAsync<TData>(Func<TData, Task> action, TData data)
     {
         if (IsSuccess)
         {
@@ -97,7 +97,7 @@ public class Result
         return (default, false);
     }
 
-    protected async Task<(T? Data, bool Success)> BindDataResult<TData, T>(Func<TData, Task<T>> action, TData data)
+    protected async Task<(T? Data, bool Success)> BindDataResultAsync<TData, T>(Func<TData, Task<T>> action, TData data)
     {
         if (IsSuccess)
         {
@@ -121,7 +121,7 @@ public class Result
         }
     }
 
-    protected async Task BindErrorResult<TData>(Func<TData, Task<Result>> action, TData data)
+    protected async Task BindErrorResultAsync<TData>(Func<TData, Task<Result>> action, TData data)
     {
         if (data is null)
         {

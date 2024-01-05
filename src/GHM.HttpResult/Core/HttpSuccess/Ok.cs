@@ -31,9 +31,9 @@ public class Ok<TData> : Ok
         return this;
     }
 
-    public async Task<Ok<TData>> Tap(Func<TData, Task> action)
+    public async Task<Ok<TData>> TapAsync(Func<TData, Task> action)
     {
-        await TapResult(action, Data);
+        await TapResultAsync(action, Data);
         return this;
     }
 
@@ -43,9 +43,9 @@ public class Ok<TData> : Ok
         return result.Success ? new(result.Data!) : new(Errors);
     }
 
-    public async Task<Ok<T>> BindData<T>(Func<TData, Task<T>> action)
+    public async Task<Ok<T>> BindDataAsync<T>(Func<TData, Task<T>> action)
     {
-        var result = await BindDataResult(action, Data);
+        var result = await BindDataResultAsync(action, Data);
         return result.Success ? new(result.Data!) : new(Errors);
     }
 
@@ -55,9 +55,9 @@ public class Ok<TData> : Ok
         return this;
     }
 
-    public async Task<Ok<TData>> BindError(Func<TData, Task<Result>> action)
+    public async Task<Ok<TData>> BindErrorAsync(Func<TData, Task<Result>> action)
     {
-        await BindErrorResult(action, Data);
+        await BindErrorResultAsync(action, Data);
         return this;
     }
 
