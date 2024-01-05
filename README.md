@@ -30,16 +30,24 @@ using GHM.HTTPResult;
 public class UserService
 {
 
-    public Ok<User> GetUser(int id)
+    public Ok<string> GetUserName(GetUserNameRequest request)
     {
-        User user = _userRepo.GetUser(id);
+        User user = _userRepo.GetUser(request.Id);
 
         if(user is null)
         {
-            return Error.NotFound($"not found user by id {id}");
+            return Error.NotFound($"not found user by id {request.Id}");
         }
-        return user
+
+        return user.Name
     }
+
+    public Ok<User> GetUserWithUniqueReturn(GetUserNameRequest request) =>
+        Ok.Create(request)
+            .BindData((req) =>_userRepo.GetUser(req.Id))
+            .BindError((user) => Result.Validate(user is null).AsNotFound($"not found user by id {request.Id}"))
+            .Map((user) => user.Name);
+
 }
 
 ```
@@ -128,11 +136,44 @@ public class Error
 
 ```
 
+### ValidationError
+
+It's just one type of validation with different ErrorHttpStatusCode or OkStatus:
+
+- NotFound
+- Forbidden
+- BadRequest
+- Unauthorized
+- Conflict
+
+```csharp
+public class ValidationError
+{
+    public ValidationError(bool isError)
+    {
+        IsError = isError;
+    }
+
+    public bool IsError { get; init; }
+
+    public Result AsNotFound(string errorTitle) => IsError ? new(Error.NotFound(errorTitle)) : Result.Successful;
+
+    public Result AsForbidden(string errorTitle) => IsError ? new(Error.Forbidden(errorTitle)) : Result.Successful;
+
+    public Result AsBadRequest(string errorTitle) => IsError ? new(Error.BadRequest(errorTitle)) : Result.Successful;
+
+    public Result AsUnauthorized(string errorTitle) => IsError ? new(Error.Unauthorized(errorTitle)) : Result.Successful;
+
+    public Result AsConflict(string errorTitle) => IsError ? new(Error.Conflict(errorTitle)) : Result.Successful;
+
+    public Result AsError(Error error) => IsError ? new(error) : Result.Successful;
+}
+```
+
 ### Result
 
 A abstract class base for Ok, Created and NoContent classes.
 `Result` has properties base as Errors, StatusCode and IsSuccess.
-`Result<TData>` is based on Result with data property
 
 ```csharp
 public abstract class Result
@@ -142,19 +183,6 @@ public abstract class Result
     public HttpStatusCode StatusCode { get; init; }
 
     public bool IsSuccess => (int)StatusCode < 400;
-}
-```
-
-### Result\<Data\>
-
-`Result<TData>` is based on Result with data property
-
-```csharp
-public abstract class Result<TData> : Result
-{
-    private readonly TData? _data;
-
-    public TData Data => IsSuccess ? _data! : throw new ArgumentException("http error has no data.");
 }
 ```
 
