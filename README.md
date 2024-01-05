@@ -11,13 +11,13 @@ GHM.HTTPResult aims to type the HTTP result of your API service or others.
 .NET CLI
 
 ```sh
-dotnet add package GHM.HttpResult --version 1.0.0
+dotnet add package GHM.HttpResult
 ```
 
 Package Manager
 
 ```sh
-NuGet\Install-Package GHM.HttpResult -Version 1.0.0
+NuGet\Install-Package GHM.HttpResult
 ```
 
 ## Example
@@ -30,9 +30,9 @@ using GHM.HTTPResult;
 public class UserService
 {
 
-    public Ok<string> GetUserName(GetUserNameRequest request)
+    public async Task<Ok<string>> GetUserName(GetUserNameRequest request)
     {
-        User user = _userRepo.GetUser(request.Id);
+        User user = await _userRepo.GetUser(request.Id);
 
         if(user is null)
         {
@@ -42,9 +42,9 @@ public class UserService
         return user.Name
     }
 
-    public Ok<User> GetUserWithUniqueReturn(GetUserNameRequest request) =>
+    public async Task<Ok<string>> GetUserWithUniqueReturn(GetUserNameRequest request) =>
         Ok.Create(request)
-            .BindData((req) =>_userRepo.GetUser(req.Id))
+            .BindDataAsync((req) => _userRepo.GetUser(req.Id))
             .BindError((user) => Result.Validate(user is null).AsNotFound($"not found user by id {request.Id}"))
             .Map((user) => user.Name);
 
@@ -63,7 +63,7 @@ public class UserController : ControllerBase
     {
         Ok<User> result = _userService.GetUser(id);
 
-        return ConvertExempleTest(result);// you can create a Converter to change return from Result to Action automaticly
+        return ConvertExempleTest(result);// you can create a Converter to change return from Result to Action automatically
     }
 
     [HttpGet]
