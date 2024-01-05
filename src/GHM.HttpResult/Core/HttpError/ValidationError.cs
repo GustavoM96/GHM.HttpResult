@@ -9,7 +9,7 @@ public class ValidationError
         IsError = isError;
     }
 
-    public bool IsError { get; set; }
+    public bool IsError { get; init; }
 
     public Result AsNotFound(string errorTitle) => IsError ? new(Error.NotFound(errorTitle)) : Result.Successful;
 
