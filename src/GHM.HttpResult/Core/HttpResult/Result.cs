@@ -79,11 +79,29 @@ public class Result
         }
     }
 
+    protected async Task TapResult<TData>(Func<TData, Task> action, TData data)
+    {
+        if (IsSuccess)
+        {
+            await action(data);
+        }
+    }
+
     protected (T? Data, bool Success) BindDataResult<TData, T>(Func<TData, T> action, TData data)
     {
         if (IsSuccess)
         {
             var newData = action(data);
+            return (newData, true);
+        }
+        return (default, false);
+    }
+
+    protected async Task<(T? Data, bool Success)> BindDataResult<TData, T>(Func<TData, Task<T>> action, TData data)
+    {
+        if (IsSuccess)
+        {
+            var newData = await action(data);
             return (newData, true);
         }
         return (default, false);
@@ -103,11 +121,31 @@ public class Result
         }
     }
 
-    protected void BindErrorResult(bool isError, Error error)
+    protected async Task BindErrorResult<TData>(Func<TData, Task<Result>> action, TData data)
     {
-        if (isError)
+        if (data is null)
         {
-            AddError(error);
+            return;
+        }
+
+        var result = await action(data);
+        if (!result.IsSuccess)
+        {
+            AddErrors(result.Errors);
+        }
+    }
+
+    protected void BindErrorResult<TData>(Func<TData, (bool, Error)> action, TData data)
+    {
+        if (data is null)
+        {
+            return;
+        }
+
+        var result = action(data);
+        if (result.Item1)
+        {
+            AddError(result.Item2);
         }
     }
 

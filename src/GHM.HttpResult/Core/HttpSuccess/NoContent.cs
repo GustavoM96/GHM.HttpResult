@@ -31,9 +31,21 @@ public class NoContent<TData> : NoContent
         return this;
     }
 
+    public async Task<NoContent<TData>> Tap(Func<TData, Task> action)
+    {
+        await TapResult(action, Data);
+        return this;
+    }
+
     public NoContent<T> BindData<T>(Func<TData, T> action)
     {
         var result = BindDataResult(action, Data);
+        return result.Success ? new(result.Data!) : new(Errors);
+    }
+
+    public async Task<NoContent<T>> BindData<T>(Func<TData, Task<T>> action)
+    {
+        var result = await BindDataResult(action, Data);
         return result.Success ? new(result.Data!) : new(Errors);
     }
 
@@ -43,9 +55,15 @@ public class NoContent<TData> : NoContent
         return this;
     }
 
-    public NoContent<TData> BindError(bool isError, Error error)
+    public async Task<NoContent<TData>> BindError(Func<TData, Task<Result>> action)
     {
-        BindErrorResult(isError, error);
+        await BindErrorResult(action, Data);
+        return this;
+    }
+
+    public NoContent<TData> BindError(Func<TData, (bool, Error)> action)
+    {
+        BindErrorResult(action, Data);
         return this;
     }
 

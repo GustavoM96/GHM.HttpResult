@@ -31,9 +31,21 @@ public class Created<TData> : Created
         return this;
     }
 
+    public async Task<Created<TData>> Tap(Func<TData, Task> action)
+    {
+        await TapResult(action, Data);
+        return this;
+    }
+
     public Created<T> BindData<T>(Func<TData, T> action)
     {
         var result = BindDataResult(action, Data);
+        return result.Success ? new(result.Data!) : new(Errors);
+    }
+
+    public async Task<Created<T>> BindData<T>(Func<TData, Task<T>> action)
+    {
+        var result = await BindDataResult(action, Data);
         return result.Success ? new(result.Data!) : new(Errors);
     }
 
@@ -43,9 +55,15 @@ public class Created<TData> : Created
         return this;
     }
 
-    public Created<TData> BindError(bool isError, Error error)
+    public async Task<Created<TData>> BindError(Func<TData, Task<Result>> action)
     {
-        BindErrorResult(isError, error);
+        await BindErrorResult(action, Data);
+        return this;
+    }
+
+    public Created<TData> BindError(Func<TData, (bool, Error)> action)
+    {
+        BindErrorResult(action, Data);
         return this;
     }
 
