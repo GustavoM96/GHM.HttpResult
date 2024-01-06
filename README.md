@@ -30,7 +30,7 @@ using GHM.HTTPResult;
 public class UserService
 {
 
-    public async Ok<string> GetUserName(GetUserNameRequest request)
+    public Ok<string> GetUserName(GetUserNameRequest request)
     {
         User user =  _userRepo.GetUser(request.Id);
 
