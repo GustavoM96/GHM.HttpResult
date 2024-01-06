@@ -30,9 +30,9 @@ using GHM.HTTPResult;
 public class UserService
 {
 
-    public async Task<Ok<string>> GetUserName(GetUserNameRequest request)
+    public async Ok<string> GetUserName(GetUserNameRequest request)
     {
-        User user = await _userRepo.GetUser(request.Id);
+        User user =  _userRepo.GetUser(request.Id);
 
         if(user is null)
         {
@@ -42,12 +42,13 @@ public class UserService
         return user.Name
     }
 
-    public async Task<Ok<string>> GetUserWithUniqueReturn(GetUserNameRequest request) =>
-        Ok.Create(request)
-            .BindDataAsync((req) => _userRepo.GetUser(req.Id))
-            .BindError((user) => Result.Validate(user is null).AsNotFound($"not found user by id {request.Id}"))
+    public Ok<string> GetUserWithRailWay(GetUserNameRequest request)
+    {
+        return Ok.Create(request)
+            .BindData((req) => _userRepo.GetUser(req.Id));
+            .BindError((user) => (user is null, Error.NotFound($"not found user by id {request.Id}")))
             .Map((user) => user.Name);
-
+    }
 }
 
 ```
