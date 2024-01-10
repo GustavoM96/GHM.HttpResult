@@ -1,6 +1,6 @@
 using System.Net;
 
-namespace GHM.HttpResult.Core;
+namespace GHM.HttpResult;
 
 public class Created<TData> : Created
 {

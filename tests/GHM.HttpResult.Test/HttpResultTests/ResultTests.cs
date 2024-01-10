@@ -1,5 +1,4 @@
 using System.Net;
-using GHM.HttpResult.Core;
 
 namespace GHM.HttpResult.Test.HttpResultTests;
 
