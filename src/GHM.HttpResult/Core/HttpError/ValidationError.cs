@@ -1,6 +1,4 @@
-﻿using System.Net;
-
-namespace GHM.HttpResult;
+﻿namespace GHM.HttpResult;
 
 public class ValidationError
 {

@@ -31,7 +31,7 @@ public class NoContent<TData> : NoContent
         return this;
     }
 
-    public async Task<NoContent<TData>> Tap(Func<TData, Task> action)
+    public async Task<NoContent<TData>> TapAsync(Func<TData, Task> action)
     {
         await TapResultAsync(action, Data);
         return this;
@@ -43,7 +43,7 @@ public class NoContent<TData> : NoContent
         return result.Success ? new(result.Data!) : new(Errors);
     }
 
-    public async Task<NoContent<T>> BindData<T>(Func<TData, Task<T>> action)
+    public async Task<NoContent<T>> BindDataAsync<T>(Func<TData, Task<T>> action)
     {
         var result = await BindDataResultAsync(action, Data);
         return result.Success ? new(result.Data!) : new(Errors);
@@ -55,7 +55,7 @@ public class NoContent<TData> : NoContent
         return this;
     }
 
-    public async Task<NoContent<TData>> BindError(Func<TData, Task<Result>> action)
+    public async Task<NoContent<TData>> BindErrorAsync(Func<TData, Task<Result>> action)
     {
         await BindErrorResultAsync(action, Data);
         return this;
