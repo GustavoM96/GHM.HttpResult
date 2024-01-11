@@ -1,4 +1,4 @@
-namespace GHM.HttpResult.Core;
+namespace GHM.HttpResult;
 
 public static class ResultExtensions
 {
