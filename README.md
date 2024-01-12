@@ -92,12 +92,13 @@ Type of HttpSuccess:
 - NoContent
 
 ```csharp
-public class Ok<TData> : Result<TData> { }
-public class Ok : Result<BasicResponse> { }
+public class Ok<TData> : Ok { }
+public class Ok : Result { }
 
-public class Created<TData> : Result<TData> { }
-public class Created : Result<BasicResponse> { }
+public class Created<TData> : Created { }
+public class Created : Result { }
 
+public class NoContent<TData> : NoContent { }
 public class NoContent : Result { }
 
 ```
