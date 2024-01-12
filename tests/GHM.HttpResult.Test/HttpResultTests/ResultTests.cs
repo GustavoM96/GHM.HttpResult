@@ -4,11 +4,11 @@ namespace GHM.HttpResult.Test.HttpResultTests;
 
 public class ResultTests
 {
-    private Created _createdResult => new();
-    private Created<string> _createdDataResult => new("created correctly");
-    private Created<string> _errorCreatedDataResult => new(_notFoundError);
-    private Error _notFoundError => Error.NotFound("error title");
-    private Error _conflictError => Error.Conflict("error title");
+    private static Created CreatedResult => new();
+    private static Created<string> CreatedDataResult => new("created correctly");
+    private static Created<string> ErrorCreatedDataResult => new(NotFoundError);
+    private static Error NotFoundError => Error.NotFound("error title");
+    private static Error ConflictError => Error.Conflict("error title");
 
     [Fact]
     public void Test_Result_Contructor()
@@ -16,7 +16,7 @@ public class ResultTests
         // Arrange
         Result successResult = new(new List<Error>(), HttpStatusCode.Created);
         Result successResult2 = new(HttpStatusCode.Created);
-        Result errorResult = new(_notFoundError);
+        Result errorResult = new(NotFoundError);
 
         // Act
 
@@ -44,7 +44,7 @@ public class ResultTests
     public void Test_ToErrorResult_When_NotFoundErrors_ThrowException()
     {
         // Assert
-        var ex = Assert.ThrowsAny<Exception>(() => _createdResult.ToErrorResult());
+        var ex = Assert.ThrowsAny<Exception>(() => CreatedResult.ToErrorResult());
         Assert.Equal("not found errors.", ex.Message);
     }
 
@@ -52,8 +52,8 @@ public class ResultTests
     public void Test_ToErrorResult_When_FindErrors_ReturnErrorResult()
     {
         // Arrange
-        Result error = new(_notFoundError);
-        Result error2 = new(new List<Error>() { _notFoundError, _notFoundError }, HttpStatusCode.Created);
+        Result error = new(NotFoundError);
+        Result error2 = new(new List<Error>() { NotFoundError, NotFoundError }, HttpStatusCode.Created);
 
         // Act
         var errorResult = error.ToErrorResult();
@@ -74,7 +74,7 @@ public class ResultTests
         static bool OnError(ErrorResult error) => false;
 
         // Act
-        var matchTest = _createdResult.Match(OnSuccess, OnError);
+        var matchTest = CreatedResult.Match(OnSuccess, OnError);
 
         // Assert
         Assert.True(matchTest);
@@ -86,7 +86,7 @@ public class ResultTests
         // Arrange
         static bool OnSuccess() => true;
         static bool OnError(ErrorResult error) => false;
-        Result error = new(_notFoundError);
+        Result error = new(NotFoundError);
 
         // Act
         var matchTest = error.Match(OnSuccess, OnError);
@@ -103,7 +103,7 @@ public class ResultTests
         void CopyData(string data) => dataCopy = data;
 
         // Act
-        _createdDataResult.Tap(CopyData);
+        CreatedDataResult.Tap(CopyData);
 
         // Assert
         Assert.Equal("created correctly", dataCopy);
@@ -117,7 +117,7 @@ public class ResultTests
         void CopyData(string data) => dataCopy = data;
 
         // Act
-        _errorCreatedDataResult.Tap(CopyData);
+        ErrorCreatedDataResult.Tap(CopyData);
 
         // Assert
         Assert.Equal("", dataCopy);
@@ -131,7 +131,7 @@ public class ResultTests
         Task CopyData(string data) => Task.FromResult(dataCopy = data);
 
         // Act
-        await _createdDataResult.TapAsync(CopyData);
+        await CreatedDataResult.TapAsync(CopyData);
 
         // Assert
         Assert.Equal("created correctly", dataCopy);
@@ -145,7 +145,7 @@ public class ResultTests
         Task CopyData(string data) => Task.FromResult(dataCopy = data);
 
         // Act
-        await _errorCreatedDataResult.TapAsync(CopyData);
+        await ErrorCreatedDataResult.TapAsync(CopyData);
 
         // Assert
         Assert.Equal("", dataCopy);
@@ -158,7 +158,7 @@ public class ResultTests
         static string NewData(string data) => data + "_new";
 
         // Act
-        var result = _createdDataResult.BindData(NewData);
+        var result = CreatedDataResult.BindData(NewData);
 
         // Assert
         Assert.Equal("created correctly_new", result.Data);
@@ -171,7 +171,7 @@ public class ResultTests
         static string NewData(string data) => data + "_new";
 
         // Act
-        var result = _errorCreatedDataResult.BindData(NewData);
+        var result = ErrorCreatedDataResult.BindData(NewData);
 
         // Assert
         Assert.Null(result.Data);
@@ -184,7 +184,7 @@ public class ResultTests
         static Task<string> NewData(string data) => Task.FromResult(data + "_new");
 
         // Act
-        var result = await _createdDataResult.BindDataAsync(NewData);
+        var result = await CreatedDataResult.BindDataAsync(NewData);
 
         // Assert
         Assert.Equal("created correctly_new", result.Data);
@@ -197,7 +197,7 @@ public class ResultTests
         static Task<string> NewData(string data) => Task.FromResult(data + "_new");
 
         // Act
-        var result = await _errorCreatedDataResult.BindDataAsync(NewData);
+        var result = await ErrorCreatedDataResult.BindDataAsync(NewData);
 
         // Assert
         Assert.Null(result.Data);
@@ -207,42 +207,42 @@ public class ResultTests
     public void Test_BindError_When_IsDataIsNotNull_ShouldReturn_ActionResult()
     {
         // Arrange
-        Result CheckData(string data) => new(_conflictError);
+        Result CheckData(string data) => new(ConflictError);
 
         // Act
-        var result = _createdDataResult.BindError(CheckData);
+        var result = CreatedDataResult.BindError(CheckData);
 
         // Assert
-        Assert.Equal(_conflictError, result.Errors[0]);
+        Assert.Equal(ConflictError, result.Errors[0]);
     }
 
     [Fact]
     public void Test_BindError_When_IsDataIsNull_ShouldNotReturn_ActionResult()
     {
         // Arrange
-        Result CheckData(string data) => new(_conflictError);
+        Result CheckData(string data) => new(ConflictError);
 
         // Act
-        var result = _errorCreatedDataResult.BindError(CheckData);
+        var result = ErrorCreatedDataResult.BindError(CheckData);
 
         // Assert
-        Assert.DoesNotContain(_conflictError, result.Errors);
+        Assert.DoesNotContain(ConflictError, result.Errors);
     }
 
     [Fact]
     public async Task Test_BindErrorAsync_Should_AddErrorByParamValue()
     {
         // Arrange
-        Task<Result> GetErrorResult(string data) => Task.FromResult(new Result(_conflictError));
+        Task<Result> GetErrorResult(string data) => Task.FromResult(new Result(ConflictError));
         Task<Result> GetSuccessResult(string data) => Task.FromResult(Result.Successful);
 
         // Act
-        var successResult = await _createdDataResult.BindErrorAsync(GetSuccessResult);
-        var errorResult = await _createdDataResult.BindErrorAsync(GetErrorResult);
+        var successResult = await CreatedDataResult.BindErrorAsync(GetSuccessResult);
+        var errorResult = await CreatedDataResult.BindErrorAsync(GetErrorResult);
 
         // Assert
-        Assert.Equal(_conflictError, errorResult.Errors[0]);
-        Assert.DoesNotContain(_conflictError, successResult.Errors);
+        Assert.Equal(ConflictError, errorResult.Errors[0]);
+        Assert.DoesNotContain(ConflictError, successResult.Errors);
     }
 
     [Fact]
@@ -252,7 +252,7 @@ public class ResultTests
         static string MapData(string data) => "new Data";
 
         // Act
-        var successResult = _createdDataResult.Map(MapData);
+        var successResult = CreatedDataResult.Map(MapData);
 
         // Assert
         Assert.Equal("new Data", successResult.Data);
@@ -265,7 +265,7 @@ public class ResultTests
         static string MapData(string data) => "new Data";
 
         // Act
-        var successResult = _errorCreatedDataResult.Map(MapData);
+        var successResult = ErrorCreatedDataResult.Map(MapData);
 
         // Assert
         Assert.Null(successResult.Data);
