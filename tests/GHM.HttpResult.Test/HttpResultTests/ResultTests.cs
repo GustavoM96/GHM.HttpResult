@@ -220,7 +220,7 @@ public class ResultTests
     public void Test_BindError_When_IsDataIsNull_ShouldNotReturn_ActionResult()
     {
         // Arrange
-        Result CheckData(string data) => new(ConflictError);
+        static Result CheckData(string data) => new(ConflictError);
 
         // Act
         var result = ErrorCreatedDataResult.BindError(CheckData);
