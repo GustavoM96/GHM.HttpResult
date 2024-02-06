@@ -41,14 +41,6 @@ public class UserService
 
         return user.Name
     }
-
-    public Ok<string> GetUserWithRailWay(GetUserNameRequest request)
-    {
-        return Ok.Create(request)
-            .BindData((req) => _userRepo.GetUser(req.Id));
-            .BindError((user) => (user is null, Error.NotFound($"not found user by id {request.Id}")))
-            .Map((user) => user.Name);
-    }
 }
 
 ```
@@ -92,13 +84,13 @@ Type of HttpSuccess:
 - NoContent
 
 ```csharp
-public class Ok<TData> : Ok { }
+public class Ok<TData> : Result<TData> { }
 public class Ok : Result { }
 
-public class Created<TData> : Created { }
+public class Created<TData> : Result<TData>  { }
 public class Created : Result { }
 
-public class NoContent<TData> : NoContent { }
+public class NoContent<TData> : Result<TData>  { }
 public class NoContent : Result { }
 
 ```
@@ -116,24 +108,24 @@ It's just one type of error with different HttpStatusCode:
 ```csharp
 public class Error
 {
-    public string Title { get; init; }
+    public string Message { get; init; }
     public HttpStatusCode StatusCode { get; init; }
 
-    private Error(string title, HttpStatusCode httpStatusCode)
+    private Error(string message, HttpStatusCode httpStatusCode)
     {
-        Title = title;
+        Message = message;
         StatusCode = httpStatusCode;
     }
 
-    public static Error NotFound(string title) => new(title, HttpStatusCode.NotFound);
+    public static Error NotFound(string message) => new(message, HttpStatusCode.NotFound);
 
-    public static Error Forbidden(string title) => new(title, HttpStatusCode.Forbidden);
+    public static Error Forbidden(string message) => new(message, HttpStatusCode.Forbidden);
 
-    public static Error BadRequest(string title) => new(title, HttpStatusCode.BadRequest);
+    public static Error BadRequest(string message) => new(message, HttpStatusCode.BadRequest);
 
-    public static Error Unauthorized(string title) => new(title, HttpStatusCode.Unauthorized);
+    public static Error Unauthorized(string message) => new(message, HttpStatusCode.Unauthorized);
 
-    public static Error Conflict(string title) => new(title, HttpStatusCode.Conflict);
+    public static Error Conflict(string message) => new(message, HttpStatusCode.Conflict);
 }
 
 ```
@@ -158,33 +150,36 @@ public class ValidationError
 
     public bool IsError { get; init; }
 
-    public Result AsNotFound(string errorTitle) => IsError ? new(Error.NotFound(errorTitle)) : Result.Successful;
+    public Result AsNotFound(string message) => IsError ? new(Error.NotFound(message)) : Result.Ok;
 
-    public Result AsForbidden(string errorTitle) => IsError ? new(Error.Forbidden(errorTitle)) : Result.Successful;
+    public Result AsForbidden(string message) => IsError ? new(Error.Forbidden(message)) : Result.Ok;
 
-    public Result AsBadRequest(string errorTitle) => IsError ? new(Error.BadRequest(errorTitle)) : Result.Successful;
+    public Result AsBadRequest(string message) => IsError ? new(Error.BadRequest(message)) : Result.Ok;
 
-    public Result AsUnauthorized(string errorTitle) => IsError ? new(Error.Unauthorized(errorTitle)) : Result.Successful;
+    public Result AsUnauthorized(string message) => IsError ? new(Error.Unauthorized(message)) : Result.Ok;
 
-    public Result AsConflict(string errorTitle) => IsError ? new(Error.Conflict(errorTitle)) : Result.Successful;
+    public Result AsConflict(string message) => IsError ? new(Error.Conflict(message)) : Result.Ok;
 
-    public Result AsError(Error error) => IsError ? new(error) : Result.Successful;
+    public Result AsError(Error error) => IsError ? new(error) : Result.Ok;
 }
 ```
 
 ### Result
 
-A abstract class base for Ok, Created and NoContent classes.
+A class base for Ok, Created and NoContent classes.
 `Result` has properties base as Errors, StatusCode and IsSuccess.
 
 ```csharp
-public abstract class Result
+public class Result
 {
-    public IReadOnlyList<Error> Errors { get; init; }
+    protected readonly List<Error> _errors = new();
+    public IReadOnlyList<Error> Errors => _errors;
+    public bool IsValid => !_errors.Any();
+}
 
-    public HttpStatusCode StatusCode { get; init; }
-
-    public bool IsSuccess => (int)StatusCode < 400;
+public class Result<TData> : Result
+{
+     public TData Data { get; init; } = default!;
 }
 ```
 
