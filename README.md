@@ -141,9 +141,9 @@ It's just one type of validation with different ErrorHttpStatusCode or OkStatus:
 - Conflict
 
 ```csharp
-public class ValidationError
+public class ValidationResult
 {
-    public ValidationError(bool isError)
+    public ValidationResult(bool isError)
     {
         IsError = isError;
     }
