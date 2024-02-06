@@ -83,13 +83,12 @@ public class Result
 
 public class Result<TData> : Result
 {
-    private readonly TData? _data;
-    public TData Data => _data!;
+    public TData Data { get; init; } = default!;
 
     public Result(TData data, HttpStatusCode statusCode)
         : base(statusCode)
     {
-        _data = data;
+        Data = data;
     }
 
     public Result(Error error)
