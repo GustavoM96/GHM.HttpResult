@@ -48,5 +48,11 @@ public class ValidationErrorTests
         Assert.Equal(HttpStatusCode.OK, result3.StatusCode);
         Assert.Equal(HttpStatusCode.OK, result4.StatusCode);
         Assert.Equal(HttpStatusCode.OK, result5.StatusCode);
+
+        Assert.Equal("OK", result1.Message);
+        Assert.Equal("OK", result2.Message);
+        Assert.Equal("OK", result3.Message);
+        Assert.Equal("OK", result4.Message);
+        Assert.Equal("OK", result5.Message);
     }
 }
