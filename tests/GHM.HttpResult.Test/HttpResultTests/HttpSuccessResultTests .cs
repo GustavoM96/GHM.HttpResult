@@ -4,9 +4,7 @@ namespace GHM.HttpResult.Test.HttpResultTests;
 
 public class HttpSuccessResultTests
 {
-    private static Created CreatedResult => new();
     private static Error NotFoundError => Error.NotFound("error title");
-    private static Error ConflictError => Error.Conflict("error title");
 
     [Fact]
     public void Test_OKResult_Contructor()
