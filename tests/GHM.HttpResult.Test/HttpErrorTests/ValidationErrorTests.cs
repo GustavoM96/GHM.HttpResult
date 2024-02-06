@@ -8,11 +8,11 @@ public class ValidationErrorTests
     public void Test_ValidationError_When_IsErrorTrue_ReturnErrorResult()
     {
         // Arrange
-        Result notFound = new ValidationError(true).AsNotFound("error");
-        Result forbidden = new ValidationError(true).AsForbidden("error");
-        Result badRequest = new ValidationError(true).AsBadRequest("error");
-        Result unauthorized = new ValidationError(true).AsUnauthorized("error");
-        Result conflict = new ValidationError(true).AsConflict("error");
+        Result notFound = Result.Validate(true).AsNotFound("error1");
+        Result forbidden = Result.Validate(true).AsForbidden("error2");
+        Result badRequest = Result.Validate(true).AsBadRequest("error3");
+        Result unauthorized = Result.Validate(true).AsUnauthorized("error4");
+        Result conflict = Result.Validate(true).AsConflict("error5");
 
         // Act
 
@@ -22,17 +22,23 @@ public class ValidationErrorTests
         Assert.Equal(HttpStatusCode.BadRequest, badRequest.StatusCode);
         Assert.Equal(HttpStatusCode.Unauthorized, unauthorized.StatusCode);
         Assert.Equal(HttpStatusCode.Conflict, conflict.StatusCode);
+
+        Assert.Equal("error1", notFound.Message);
+        Assert.Equal("error2", forbidden.Message);
+        Assert.Equal("error3", badRequest.Message);
+        Assert.Equal("error4", unauthorized.Message);
+        Assert.Equal("error5", conflict.Message);
     }
 
     [Fact]
     public void Test_ValidationError_When_IsErrorfalse_ReturnSuccessfulResult()
     {
         // Arrangesucce
-        Result result1 = new ValidationError(false).AsNotFound("error");
-        Result result2 = new ValidationError(false).AsForbidden("error");
-        Result result3 = new ValidationError(false).AsBadRequest("error");
-        Result result4 = new ValidationError(false).AsUnauthorized("error");
-        Result result5 = new ValidationError(false).AsConflict("error");
+        Result result1 = new ValidationResult(false).AsNotFound("error");
+        Result result2 = new ValidationResult(false).AsForbidden("error");
+        Result result3 = new ValidationResult(false).AsBadRequest("error");
+        Result result4 = new ValidationResult(false).AsUnauthorized("error");
+        Result result5 = new ValidationResult(false).AsConflict("error");
 
         // Act
 

@@ -4,159 +4,101 @@ namespace GHM.HttpResult;
 
 public class Result
 {
-    private readonly List<Error> _errors;
+    protected readonly List<Error> _errors = new();
     public IReadOnlyList<Error> Errors => _errors;
+    public bool IsValid => !_errors.Any();
 
-    public HttpStatusCode StatusCode { get; private set; }
-
-    public bool IsSuccess => (int)StatusCode < 400;
-
-    public Result(HttpStatusCode statusCode)
-    {
-        StatusCode = statusCode;
-        _errors = new List<Error> { };
-    }
-
-    private HttpStatusCode SetStatus(List<Error> errors, HttpStatusCode statusCode)
-    {
-        if (errors.Count > 1)
+    public string Message =>
+        _errors.Count switch
         {
-            return HttpStatusCode.BadRequest;
-        }
+            0 => "OK",
+            1 => Errors[0].Message,
+            _ => "many error has occurred."
+        };
 
-        return errors.FirstOrDefault()?.StatusCode ?? statusCode;
+    public Result(IEnumerable<Error> errors)
+    {
+        _errors = errors.ToList();
+        StatusCode = SetErrorStatus(_errors);
     }
 
     public Result(IEnumerable<Error> errors, HttpStatusCode statusCode)
     {
         _errors = errors.ToList();
-        StatusCode = SetStatus(_errors, statusCode);
+        StatusCode = _errors.Any() ? SetErrorStatus(_errors) : statusCode;
     }
 
     public Result(Error error)
     {
-        StatusCode = error.StatusCode;
         _errors = new List<Error> { error };
+        StatusCode = error.StatusCode;
     }
 
-    protected void AddErrors(IEnumerable<Error> errors)
+    public HttpStatusCode StatusCode { get; private set; }
+
+    public Result(HttpStatusCode statusCode)
+    {
+        StatusCode = statusCode;
+    }
+
+    private static HttpStatusCode SetErrorStatus(List<Error> errors)
+    {
+        return errors.Count == 1 ? errors.First().StatusCode : HttpStatusCode.BadRequest;
+    }
+
+    public void AddErrors(IEnumerable<Error> errors)
     {
         _errors.AddRange(errors.ToList());
-        StatusCode = SetStatus(_errors, HttpStatusCode.BadRequest);
+        StatusCode = SetErrorStatus(_errors);
     }
 
-    protected void AddError(Error error)
+    public void AddError(Error error)
     {
         _errors.Add(error);
-        StatusCode = SetStatus(_errors, HttpStatusCode.BadRequest);
+        StatusCode = SetErrorStatus(_errors);
     }
 
-    public static Result Successful => new(HttpStatusCode.OK);
+    public static Result Ok => new(HttpStatusCode.OK);
 
-    public static ValidationError Validate(bool isError) => new(isError);
+    public static ValidationResult Validate(bool isError) => new(isError);
 
     public ErrorResult ToErrorResult()
     {
-        if (!Errors.Any())
-        {
-            throw new ArgumentException("not found errors.");
-        }
-
-        var title = Errors.Count == 1 ? Errors[0].Title : "many error has occurred.";
-        return new(title, StatusCode, Errors);
+        return Errors.Any() ? new(Message, StatusCode, Errors) : throw new ArgumentException("not found errors.");
     }
 
-    public TResult Match<TResult>(Func<TResult> onSuccess, Func<ErrorResult, TResult> onError)
+    public SuccessResult ToSuccessResult() => new(StatusCode);
+
+    public TResult Match<TResult>(Func<SuccessResult, TResult> onSuccess, Func<ErrorResult, TResult> onError)
     {
-        return IsSuccess ? onSuccess() : onError(ToErrorResult());
+        return IsValid ? onSuccess(ToSuccessResult()) : onError(ToErrorResult());
+    }
+}
+
+public class Result<TData> : Result
+{
+    private readonly TData? _data;
+    public TData Data => _data!;
+
+    public Result(TData data, HttpStatusCode statusCode)
+        : base(statusCode)
+    {
+        _data = data;
     }
 
-    protected void TapResult<TData>(Action<TData> action, TData data)
+    public Result(Error error)
+        : base(error) { }
+
+    public Result(IEnumerable<Error> errors)
+        : base(errors) { }
+
+    public Result(IEnumerable<Error> errors, HttpStatusCode statusCode)
+        : base(errors, statusCode) { }
+
+    public SuccessResult<TData> ToSuccessDataResult() => new(Data, StatusCode);
+
+    public TResult Match<TResult>(Func<SuccessResult<TData>, TResult> onSuccess, Func<ErrorResult, TResult> onError)
     {
-        if (IsSuccess)
-        {
-            action(data);
-        }
-    }
-
-    protected async Task TapResultAsync<TData>(Func<TData, Task> action, TData data)
-    {
-        if (IsSuccess)
-        {
-            await action(data);
-        }
-    }
-
-    protected (T? Data, bool Success) BindDataResult<TData, T>(Func<TData, T> action, TData data)
-    {
-        if (IsSuccess)
-        {
-            var newData = action(data);
-            return (newData, true);
-        }
-        return (default, false);
-    }
-
-    protected async Task<(T? Data, bool Success)> BindDataResultAsync<TData, T>(Func<TData, Task<T>> action, TData data)
-    {
-        if (IsSuccess)
-        {
-            var newData = await action(data);
-            return (newData, true);
-        }
-        return (default, false);
-    }
-
-    protected void BindErrorResult<TData>(Func<TData, Result> action, TData data)
-    {
-        if (data is null)
-        {
-            return;
-        }
-
-        var result = action(data);
-        if (!result.IsSuccess)
-        {
-            AddErrors(result.Errors);
-        }
-    }
-
-    protected async Task BindErrorResultAsync<TData>(Func<TData, Task<Result>> action, TData data)
-    {
-        if (data is null)
-        {
-            return;
-        }
-
-        var result = await action(data);
-        if (!result.IsSuccess)
-        {
-            AddErrors(result.Errors);
-        }
-    }
-
-    protected void BindErrorResult<TData>(Func<TData, (bool, Error)> action, TData data)
-    {
-        if (data is null)
-        {
-            return;
-        }
-
-        var result = action(data);
-        if (result.Item1)
-        {
-            AddError(result.Item2);
-        }
-    }
-
-    protected static (T? Data, bool Success) MapResult<TData, T>(Func<TData, T> action, TData data)
-    {
-        if (data is null)
-        {
-            return (default, false);
-        }
-
-        var newData = action(data);
-        return (newData, true);
+        return IsValid ? onSuccess(ToSuccessDataResult()) : onError(ToErrorResult());
     }
 }
