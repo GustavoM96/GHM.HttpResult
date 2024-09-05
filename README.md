@@ -4,6 +4,8 @@
 
 <h1 align="center"> GHM.HTTPResult </h1>
 
+[![Build & Test](https://github.com/GustavoM96/GHM.HttpResult/actions/workflows/build.yml/badge.svg)](https://github.com/GustavoM96/GHM.HttpResult/actions/workflows/build.yml)
+
 GHM.HTTPResult aims to type the HTTP result of your API service or others.
 
 ## Install Package
